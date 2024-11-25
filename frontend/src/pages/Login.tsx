@@ -1,6 +1,48 @@
+import { useState } from "react";
 import { Link } from "react-router";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!email || email.length < 2) {
+      alert("Please enter a valid email");
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      alert("Successfully logged in");
+
+      // clear fields
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-lg">
@@ -14,7 +56,7 @@ export default function Login() {
         </p>
 
         <form
-          action="#"
+          onSubmit={handleSubmit}
           className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
         >
           <p className="text-center text-lg font-medium">
@@ -29,8 +71,10 @@ export default function Login() {
             <div className="relative">
               <input
                 type="email"
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter email"
+                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
               />
 
               <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
@@ -60,8 +104,10 @@ export default function Login() {
             <div className="relative">
               <input
                 type="password"
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
               />
 
               <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
