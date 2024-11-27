@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
+  const { login, isAuthenticated } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,29 +22,17 @@ export default function Login() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await res.json();
-      console.log(data);
-
-      alert("Successfully logged in");
-
+      await login(email, password);
+    } catch (err) {
+      console.error(err);
+    } finally {
       // clear fields
       setEmail("");
       setPassword("");
-    } catch (err) {
-      console.error(err);
     }
   }
+
+  if (isAuthenticated) return <Navigate to="/" />;
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
