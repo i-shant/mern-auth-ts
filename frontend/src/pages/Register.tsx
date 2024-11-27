@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Register() {
+  const { signup, isAuthenticated } = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,31 +28,18 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
-
-      const data = await res.json();
-      console.log(data);
-
-      alert("Successfully registered");
-
+      await signup(name, email, password);
+    } catch (err) {
+      console.error(err);
+    } finally {
       // clear fields
       setName("");
       setEmail("");
       setPassword("");
-    } catch (err) {
-      console.error(err);
     }
   }
+
+  if (isAuthenticated) return <Navigate to="/" />;
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
